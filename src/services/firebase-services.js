@@ -2,15 +2,14 @@ import * as firebase from 'firebase';
 import uuid from 'uuid/v1';
 
 const firebaseInitializer = () => {
-    var config = {
-        apiKey: "<API_KEY>",
-        authDomain: "<PROJECT_ID>.firebaseapp.com",
-        databaseURL: "https://<DATABASE_NAME>.firebaseio.com",
-        projectId: "<PROJECT_ID>",
-        storageBucket: "<BUCKET>.appspot.com",
-        messagingSenderId: "<SENDER_ID>",
-      };
-    firebase.initializeApp(config);
+    firebase.initializeApp({
+        apiKey: process.env.FIREBASE_APP_API_KEY,
+        authDomain: process.env.FIREBASE_APP_AUTH_DOMAIN,
+        databaseURL: process.env.FIREBASE_APP_DATABASE_URL,
+        projectId: process.env.FIREBASE_APP_PROJECT_ID,
+        storageBucket: process.env.FIREBASE_APP_STORAGE_BUCKET,
+        messagingSenderId: process.env.FIREBASE_APP_MSG_SENDER_ID,
+    });
     return firebase;
 }
 
