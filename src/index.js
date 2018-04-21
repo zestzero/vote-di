@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { firebaseInitializer } from './services/firebase-services';
+import { firebaseInitializer } from './services/firebase-service';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 
