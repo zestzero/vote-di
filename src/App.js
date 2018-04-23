@@ -2,7 +2,7 @@ import _ from 'lodash';
 import uuid from 'uuid/v1';
 
 import React, { Component } from 'react';
-import { createQuestion, getQuestionList } from './services/question-service';
+import { createQuestion, getQuestionList, voteByQuestionId } from './services/question-service';
 import { Question } from './components/Question';
 
 const DEFAULT_STATE = {
@@ -44,7 +44,8 @@ class App extends Component {
   }
 
   onOptionNumberChange = (e) => {
-    this.setState({ optionNumber: e.target.value })
+    const enterNumber = e.target.value;
+    if (enterNumber > 0 && enterNumber <= 5) this.setState({ optionNumber: e.target.value })
   }
 
   onChoiceChange = (choiceNum) => (e) => {
@@ -54,20 +55,29 @@ class App extends Component {
     this.setState({ choices })
   }
 
+  onVote = (questionId, choiceIndex) => () => {
+    voteByQuestionId(questionId, choiceIndex);
+    this.fetchQuestions();
+  }
+
   renderQuestionList = () => {
     if (!this.state.questions) return null;
-    const orderedList = _.orderBy(this.state.questions, question => question.created, ['desc']);
 
-    return _.map(orderedList, question => (
-      <Question {...question} />
-    ))
+    return Object.keys(this.state.questions).map((qId) => {
+      return (
+        <Question key={qId} _id={qId} {...this.state.questions[qId]} onVote={this.onVote} />
+      )
+    })
   }
 
   renderOption = () => {
     const optionForm = [];
     for (let i = 0; i < this.state.optionNumber; i ++) {
       optionForm.push(
-        [ <label>Option {i+1}</label>, <input type="text" onChange={this.onChoiceChange(i)} /> ]
+        [
+          <label key={`label-${i}`}>Option {i+1}</label>,
+          <input key={`input-${i}`} type="text" onChange={this.onChoiceChange(i)} />
+        ]
       )
     }
     return optionForm;
@@ -84,13 +94,17 @@ class App extends Component {
         </p>
         <label>Title</label>
         <input type="text" onChange={this.onTextChange('title')} value={this.state.question.title} />
+        <br />
         <label>Description</label>
         <input type="text" onChange={this.onTextChange('description')} value={this.state.question.description} />
+        <br />
         <label>Image URL</label>
         <input type="text" onChange={this.onTextChange('imageUrl')} value={this.state.question.imageUrl} />
-        <label>Option number</label>
+        <br />
+        <label>Option number (maximum is 5)</label>
         <input type="text" onChange={this.onOptionNumberChange} />
         {this.renderOption()}
+        <br />
         <button onClick={this.onSubmit}>Submit</button>
         <button onClick={this.onCancel}>Cancel</button>
         {this.renderQuestionList()}

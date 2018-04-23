@@ -7,8 +7,7 @@ const getQuestionList = async (limit = 10) => {
 }
 
 const createQuestion = async ({ _id, title, description, imageUrl, choices }) => {
-  firebase.database().ref('questions').push({
-      _id,
+  firebase.database().ref(`questions/${_id}`).set({
       title,
       description,
       imageUrl,
@@ -17,7 +16,22 @@ const createQuestion = async ({ _id, title, description, imageUrl, choices }) =>
   });
 }
 
+const voteByQuestionId = async (_id, choiceIndex) => {
+  const choicesRef = firebase.database().ref(`questions/${_id}/choices/${choiceIndex}`);
+  choicesRef.transaction(function(choice) {
+    if (choice) {
+      if (choice.vote) {
+        choice.vote++;
+      } else {
+        choice.vote = 1
+      }
+    }
+    return choice;
+  });
+}
+
 export {
   getQuestionList,
   createQuestion,
+  voteByQuestionId,
 }
